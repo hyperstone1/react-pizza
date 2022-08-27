@@ -1,4 +1,4 @@
 # React-pizza
 
-## Stack:
-React, redux-toolkit, react-router, scss, skeleton, axios
+## Stack: React, redux-toolkit, react-router, scss, skeleton, axios
+
