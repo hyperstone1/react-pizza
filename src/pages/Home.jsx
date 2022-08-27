@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import qs from 'qs';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 import { setCategoryId, setCurrentPage, setFilters } from '../redux/slices/filterSlice';
 import { setItems } from '../redux/slices/pizzaSlice';
@@ -122,7 +122,11 @@ const Home = () => {
   //   })
   //   .map((obj) => <PizzaBlock key={obj.id} {...obj} />); // Вариант с поиском по статичному массиву
 
-  const pizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
+  const pizzas = items.map((obj) => (
+
+      <PizzaBlock key={obj.id} {...obj} />
+
+  ));
 
   const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
 
