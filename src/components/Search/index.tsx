@@ -4,9 +4,10 @@ import debounce from 'lodash.debounce';
 import { useDispatch } from 'react-redux';
 import { setSearchValue } from '../../redux/slices/filter/filterSlice';
 
+
 const Search = () => {
   const dispatch = useDispatch();
-  const inputRef = useRef();
+  const inputRef = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState('');
   // const testDebounce = useCallback(() => {
   //   debounce((event) => {
@@ -18,16 +19,17 @@ const Search = () => {
   const onClickClear = () => {
     setValue('');
     dispatch(setSearchValue(''));
-    inputRef.current.focus();
+    inputRef.current?.focus();
   };
   const updateSearchValue = useCallback(
-    debounce((str) => {
+    debounce((str: string) => {
       dispatch(setSearchValue(str));
     }, 300),
     [],
   );
 
-  const onChangeInput = (event) => {
+  // Если указывать без <HTMLInputElement>, то target не понимает откуда брать value
+  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValue(event.target.value);
     updateSearchValue(event.target.value);
   };
@@ -82,7 +84,6 @@ const Search = () => {
           className={styles.clearIcon}
           onClick={onClickClear}
           height="512px"
-          style={{ enableBackground: 'new 0 0 512 512' }}
           version="1.1"
           viewBox="0 0 512 512"
           width="512px"

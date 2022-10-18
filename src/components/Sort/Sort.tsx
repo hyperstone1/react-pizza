@@ -1,30 +1,46 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSort, selectSort } from '../../redux/slices/filter/filterSlice';
+import { Sort as SortType, SortPropertyEnum } from '../../redux/slices/filter/types';
 
-export const list = [
-  { name: 'популярности(DESC)', sortProperty: 'rating' },
-  { name: 'популярности(ASC)', sortProperty: '-rating' },
-  { name: 'цене(DESC)', sortProperty: 'price' },
-  { name: 'цене(ASC)', sortProperty: '-price' },
-  { name: 'алфавиту(DESC)', sortProperty: 'title' },
-  { name: 'алфавиту(ASC)', sortProperty: '-title' },
+type SortItem = {
+  name: string;
+  sortProperty: SortPropertyEnum;
+};
+
+type PopupClick = MouseEvent & {
+  path: Node[];
+}; // Таким образом можно создавать типы,если к одному типу нужно прикрутить еще один кастомный тип или свойство
+
+type SortPopupProps = {
+  value: SortType;
+};
+
+export const list: SortItem[] = [
+  { name: 'популярности(DESC)', sortProperty: SortPropertyEnum.RATING_DESC },
+  { name: 'популярности(ASC)', sortProperty: SortPropertyEnum.RATING_ASC },
+  { name: 'цене(DESC)', sortProperty: SortPropertyEnum.PRICE_DESC },
+  { name: 'цене(ASC)', sortProperty: SortPropertyEnum.PRICE_ASC },
+  { name: 'алфавиту(DESC)', sortProperty: SortPropertyEnum.TITLE_DESC },
+  { name: 'алфавиту(ASC)', sortProperty: SortPropertyEnum.TITLE_ASC },
 ];
 
-export const Sort = () => {
+export const Sort: React.FC<SortPopupProps> = () => {
   const dispatch = useDispatch();
   const sort = useSelector(selectSort);
-  const sortRef = useRef(null);
-  const [isOpen, setIsOpen] = useState();
+  const sortRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const onClickListItem = (obj) => {
+  const onClickListItem = (obj: SortItem) => {
     dispatch(setSort(obj));
     setIsOpen(false);
   };
   console.log(sortRef);
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.path.includes(sortRef.current)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const _event = event as PopupClick;
+      if (sortRef.current && !_event.path.includes(sortRef.current)) {
         setIsOpen(false);
       }
     };
