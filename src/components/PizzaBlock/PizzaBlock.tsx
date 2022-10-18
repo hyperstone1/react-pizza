@@ -1,61 +1,60 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux/es/exports';
-import { addItem } from '../redux/slices/cartSlice';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectCartItemById } from '../../redux/slices/cart/cartSlice';
+import { addItem } from '../../redux/slices/cart/cartSlice';
+import { Link } from 'react-router-dom';
 
 const typeNames = ['тонкое', 'традиционное'];
 
-const FullPizza = () => {
-  const [pizza, setPizza] = useState();
-  const { id } = useParams();
-  const navigate = useNavigate();
+type PizzaBlockProps = {
+  id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  sizes: number[];
+  types: number[];
+  rating: number;
+};
+
+export const PizzaBlock: React.FC<PizzaBlockProps> = ({
+  name,
+  price,
+  imageUrl,
+  sizes,
+  types,
+  id,
+}) => {
   const dispatch = useDispatch();
+  const cartItem = useSelector(selectCartItemById(id));
   const [activeType, setActiveType] = useState(0);
   const [activeSize, setActiveSize] = useState(0);
+
+  const addedCount = cartItem ? cartItem.count : 0;
 
   const onClickAdd = () => {
     const item = {
       id,
-      name: pizza.name,
-      price: pizza.price,
-      imageUrl: pizza.imageUrl,
+      name,
+      price,
+      imageUrl,
       type: typeNames[activeType],
-      size: pizza.sizes[activeSize],
+      size: sizes[activeSize],
+      count: 0,
     };
     dispatch(addItem(item));
   };
 
-  useEffect(() => {
-    async function fetchPizza() {
-      try {
-        const { data } = await axios.get('https://62bedd9f0bc9b12561613263.mockapi.io/items/' + id);
-        setPizza(data);
-        console.log(pizza);
-      } catch (error) {
-        alert('Ошибка при получении пиццы!');
-        navigate('/');
-      }
-    }
-    fetchPizza();
-  }, []);
-
-  if (!pizza) {
-    return <p>Загрузка... </p>;
-  }
-
   return (
-    <div className="container">
-      <div className="pizza-cart">
-        <img src={pizza.imageUrl} />
-        <h2>{pizza.name}</h2>
-        <h3>
-          Описание: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Praesentium, tempora
-          harum? Eum ratione incidunt tempora ullam eveniet?
-        </h3>
+    <div className="pizza-block-wrapper">
+      <div className="pizza-block">
+        <Link to={`/pizza/${id}`}>
+          <img className="pizza-block__image" src={imageUrl} alt="Pizza" />
+        </Link>
+
+        <h4 className="pizza-block__title">{name}</h4>
         <div className="pizza-block__selector">
           <ul>
-            {pizza.types.map((type) => (
+            {types.map((type) => (
               <li
                 key={type}
                 onClick={() => setActiveType(type)}
@@ -66,7 +65,7 @@ const FullPizza = () => {
             ))}
           </ul>
           <ul>
-            {pizza.sizes.map((size, id) => (
+            {sizes.map((size, id) => (
               <li
                 key={id}
                 onClick={() => setActiveSize(id)}
@@ -78,8 +77,7 @@ const FullPizza = () => {
           </ul>
         </div>
         <div className="pizza-block__bottom">
-          <h4>Цена: {pizza.price} ₽</h4>
-
+          <div className="pizza-block__price">от {price} ₽</div>
           <button onClick={onClickAdd} className="button button--outline button--add">
             <svg
               width="12"
@@ -94,11 +92,10 @@ const FullPizza = () => {
               ></path>
             </svg>
             <span>Добавить</span>
+            {addedCount > 0 && <i>{addedCount}</i>}
           </button>
         </div>
       </div>
     </div>
   );
 };
-
-export default FullPizza;

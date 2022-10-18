@@ -1,8 +1,6 @@
 import './scss/app.scss';
-import { Header } from './components/Header/Header';
 import NotFound from './pages/NotFound';
-import { Routes, Route, Outlet } from 'react-router-dom';
-import { Children, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Cart from './pages/Cart';
 import FullPizza from './pages/FullPizza';

@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import qs from 'qs';
 import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { setCategoryId, setCurrentPage, setFilters } from '../redux/slices/filterSlice';
-import { setItems } from '../redux/slices/pizzaSlice';
+import { setCategoryId, setCurrentPage, setFilters } from '../redux/slices/filter/filterSlice';
+// import { setItems } from '../redux/slices/pizza/pizzaSlice';
 import { Categories } from '../components/Categories/Categories';
 import { list, Sort } from '../components/Sort/Sort';
 import { PizzaBlock } from '../components/PizzaBlock/PizzaBlock';
 import { Skeleton } from '../components/PizzaBlock/Skeleton';
 import Pagination from '../components/Pagination';
-import { SearchContext } from '../App';
-import { fetchPizzas, selectPizzaData } from '../redux/slices/pizzaSlice';
-import { selectFitler } from '../redux/slices/filterSlice';
+import { selectPizzaData } from '../redux/slices/pizza/pizzaSlice';
+import { selectFitler } from '../redux/slices/filter/filterSlice';
+import { fetchPizzas } from '../redux/slices/pizza/asyncActions';
+import { useAppDispatch } from '../redux/store';
 
-const Home = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { categoryId, sort, currentPage, searchValue } = useSelector(selectFitler);
   const { items, status } = useSelector(selectPizzaData);
   const sortType = sort.sortProperty;
@@ -46,9 +46,10 @@ const Home = () => {
         order,
         category,
         search,
-        currentPage,
+        currentPage: String(currentPage),
       }),
     );
+    window.scrollTo(0, 0);
   };
 
   // const [sortType, setSortType] = useState({
@@ -73,22 +74,23 @@ const Home = () => {
 
   //Если был первый рендер,то проверяем URL параметры и сохраняем их в redux
   useEffect(() => {
-    if (window.location.search) {
-      const params = qs.parse(window.location.search.substring(1));
-      const sort = list.find((obj) => obj.sortProperty === params.sortBy);
-      dispatch(
-        setFilters({
-          searchValue: params.search,
-          categoryId: Number(params.category),
-          currentPage: Number(params.currentPage),
-          sort: sort || list[0],
-        }),
-      );
-      isSearch.current = true;
-    }
+    // if (window.location.search) {
+    //   const params = qs.parse(window.location.search.substring(1));
+    //   const sort = list.find((obj) => obj.sortProperty === params.sortBy);
+    //   dispatch(
+    //     setFilters({
+    //       searchValue: params.search,
+    //       categoryId: Number(params.category),
+    //       currentPage: Number(params.currentPage),
+    //       sort: sort || list[0],
+    //     }),
+    //   );
+    //   isSearch.current = true;
+    // }
+    getPizzas()
   }, []);
 
-  const onChangeCategory = (id) => {
+  const onChangeCategory = (id: number) => {
     dispatch(setCategoryId(id));
   };
 
@@ -110,7 +112,7 @@ const Home = () => {
     //   });
   }, [categoryId, sortType, searchValue, currentPage]);
 
-  const onChangePage = (number) => {
+  const onChangePage = (number: number) => {
     dispatch(setCurrentPage(number));
   };
   // const pizzas = items
@@ -122,11 +124,7 @@ const Home = () => {
   //   })
   //   .map((obj) => <PizzaBlock key={obj.id} {...obj} />); // Вариант с поиском по статичному массиву
 
-  const pizzas = items.map((obj) => (
-
-      <PizzaBlock key={obj.id} {...obj} />
-
-  ));
+  const pizzas = items.map((obj: any) => <PizzaBlock key={obj.id} {...obj} />);
 
   const skeletons = [...new Array(6)].map((_, index) => <Skeleton key={index} />);
 
@@ -140,7 +138,7 @@ const Home = () => {
       {status === 'error' ? (
         <div className="cart cart--empty">
           <h2>
-            Произошла ошибка<icon>😕</icon>
+            Произошла ошибка<i>😕</i>
           </h2>
           <p>
             К сожаленю не удалось получить список пицц.

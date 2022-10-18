@@ -1,7 +1,7 @@
 import React from 'react';
 import ContentLoader from 'react-content-loader';
 
-export const Skeleton = () => {
+export const Skeleton: React.FC = () => {
   return (
     <ContentLoader
       className="pizza-block"
@@ -10,7 +10,8 @@ export const Skeleton = () => {
       height={460}
       viewBox="0 0 280 460"
       backgroundColor="#f3f3f3"
-      foregroundColor="#ecebeb">
+      foregroundColor="#ecebeb"
+    >
       <circle cx="132" cy="142" r="115" />
       <rect x="0" y="273" rx="6" ry="6" width="280" height="26" />
       <rect x="0" y="310" rx="6" ry="6" width="280" height="84" />
