@@ -53,7 +53,7 @@ const FullPizza: React.FC = () => {
   }, []);
 
   if (!pizza) {
-    return <>Загрузка... </>;
+    return <h4 style={{ display: 'flex', justifyContent: 'center' }}>Загрузка... </h4>;
   }
 
   return (
