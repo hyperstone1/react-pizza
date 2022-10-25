@@ -32,3 +32,10 @@
     opacity: 0.8;
   }
 }
+@media (max-width: 645px) {
+  .root {
+    .input {
+      width: 330px;
+    }
+  }
+}
