@@ -14,6 +14,7 @@ import { selectPizzaData } from '../redux/slices/pizza/pizzaSlice';
 import { selectFitler } from '../redux/slices/filter/filterSlice';
 import { fetchPizzas } from '../redux/slices/pizza/asyncActions';
 import { useAppDispatch } from '../redux/store';
+import { SearchPizzaParams } from '../redux/slices/pizza/types';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -23,8 +24,16 @@ const Home: React.FC = () => {
   const sortType = sort.sortProperty;
   const isSearch = useRef(false);
   const isMounted = useRef(false);
+  const categories = ['Все', 'Мясные', 'Вегетарианские', 'Гриль', 'Острые', 'Закрытые'];
 
   console.log(sort.sortProperty);
+
+  const onChangeCategory = React.useCallback((id: number) => {
+    dispatch(setCategoryId(id));
+  }, []);
+  const onChangePage = (number: number) => {
+    dispatch(setCurrentPage(number));
+  };
 
   const getPizzas = async () => {
     const sortBy = sortType.replace('-', '');
@@ -69,30 +78,31 @@ const Home: React.FC = () => {
       const queryString = qs.stringify(params, { skipNulls: true });
       navigate(`/?${queryString}`);
     }
+    // if (!window.location.search) {
+    //   dispatch(fetchPizzas({} as SearchPizzaParams));
+    // }
     isMounted.current = true; // Первый рендер произошел, т.е. со второго рендера effect отрабаывает
   }, [categoryId, sortType, searchValue, currentPage]);
 
   //Если был первый рендер,то проверяем URL параметры и сохраняем их в redux
   useEffect(() => {
-    // if (window.location.search) {
-    //   const params = qs.parse(window.location.search.substring(1));
-    //   const sort = list.find((obj) => obj.sortProperty === params.sortBy);
-    //   dispatch(
-    //     setFilters({
-    //       searchValue: params.search,
-    //       categoryId: Number(params.category),
-    //       currentPage: Number(params.currentPage),
-    //       sort: sort || list[0],
-    //     }),
-    //   );
-    //   isSearch.current = true;
-    // }
+    if (window.location.search) {
+      const params = qs.parse(window.location.search.substring(1));
+      const sort = list.find((obj) => obj.sortProperty === params.sortProperty);
+
+      dispatch(
+        setFilters({
+          searchValue: String(params.search),
+          categoryId: Number(params.category),
+          currentPage: Number(params.currentPage),
+          sort: sort || list[0],
+        }),
+      );
+      isSearch.current = true;
+    }
+
     getPizzas();
   }, []);
-
-  const onChangeCategory = (id: number) => {
-    dispatch(setCategoryId(id));
-  };
 
   // Если был первый рендер, то запрашиавет пиццы
   useEffect(() => {
@@ -112,9 +122,6 @@ const Home: React.FC = () => {
     //   });
   }, [categoryId, sortType, searchValue, currentPage]);
 
-  const onChangePage = (number: number) => {
-    dispatch(setCurrentPage(number));
-  };
   // const pizzas = items
   //   .filter((obj) => {
   //     if (obj.name.toLowerCase().includes(searchValue.toLowerCase())) {
@@ -131,10 +138,18 @@ const Home: React.FC = () => {
   return (
     <div className="container">
       <div className="content__top">
-        <Categories value={categoryId} onChangeCategory={onChangeCategory} />
+        <Categories
+          categories={categories}
+          value={categoryId}
+          onChangeCategory={onChangeCategory}
+        />
         <Sort value={sort} />
       </div>
-      <h2 className="content__title">Все пиццы</h2>
+      {categories.map((categoryName, id) => (
+        <h2 key={id} className="content__title">
+          {id === categoryId && ` ${categoryName} пиццы`}
+        </h2>
+      ))}
       {status === 'error' ? (
         <div className="cart cart--empty">
           <h2>

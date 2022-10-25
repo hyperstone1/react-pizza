@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux/es/exports';
 import { addItem } from '../redux/slices/cart/cartSlice';
 import { useAppDispatch } from '../redux/store';
+import { useSelector } from 'react-redux';
+import Skeleton from './FullPizza/Skeleton';
+import { selectPizzaData } from '../redux/slices/pizza/pizzaSlice';
 
 const typeNames = ['тонкое', 'традиционное'];
 
@@ -22,6 +24,7 @@ const FullPizza: React.FC = () => {
   const dispatch = useAppDispatch();
   const [activeType, setActiveType] = useState(0);
   const [activeSize, setActiveSize] = useState(0);
+  const { items, status } = useSelector(selectPizzaData);
 
   const onClickAdd = () => {
     if (pizza) {
@@ -53,7 +56,13 @@ const FullPizza: React.FC = () => {
   }, []);
 
   if (!pizza) {
-    return <h4 style={{ display: 'flex', justifyContent: 'center' }}>Загрузка... </h4>;
+    return (
+      <div className="container">
+        <div className="pizza-cart">
+          <Skeleton />
+        </div>
+      </div>
+    );
   }
 
   return (
